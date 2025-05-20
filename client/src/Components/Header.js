@@ -6,6 +6,7 @@ import { logout } from "../Features/UserSlice";
 import { useSelector, useDispatch } from "react-redux";
 import Location from './Location';
 
+
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,8 +26,8 @@ const Header = () => {
     borderRadius: "8px",
   };
 
-  const isOwner = user?.role === "owner"; // Ensure the role is defined in user state
-  const isRegularUser = user?.role === "user";
+  const isowners = user?.role === "owner"; // Ensure the role is defined in user state
+  const isUsers = user?.role === "user";
 
   return (
     <div className="shadow-sm">
@@ -61,7 +62,7 @@ const Header = () => {
           ) : (
             // Logged-in user
             <>
-              {isRegularUser && (
+              {isUsers && (
                 <>
                   <Link to="/UserTeachers">
                     <Button style={buttonStyle}>UserTeachers</Button>
@@ -75,7 +76,7 @@ const Header = () => {
                 </>
               )}
 
-              {isOwner && (
+              {isowners && (
                 <>
                   <Link to="/Profile">
                     <Button style={buttonStyle}>Profile</Button>
@@ -87,7 +88,11 @@ const Header = () => {
                     <Button style={buttonStyle}>PostParticipate</Button>
                   </Link>
                 </>
+                
               )}
+                <div>
+                  <Location />
+                </div>
 
               <Button style={buttonStyle} onClick={handleLogout}>
                 Logout

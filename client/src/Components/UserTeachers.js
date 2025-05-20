@@ -3,8 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { FaThumbsUp } from 'react-icons/fa6';
-import { getTeachers, likeTeachers } from '../Features/TeacherSlice';
-import { addTolist } from './Features/ListSlice';
+
+import { getTeachers, liketeachers } from '../Features/TeacherSlice';
+import { addTolist } from '../Features/ListSlice';
 
 const ListTeachers = () => {
   const dispatch = useDispatch();
@@ -21,22 +22,22 @@ const ListTeachers = () => {
       teacherId,
       userEmail: user.email,
     };
-    dispatch(likeTeachers(teacherData));
+    dispatch(liketeachers(teacherData));
     navigate('/home');
   };
 
-  const handleAddToList = (teacherId) => {
-    const teacherItem = teachers.find((t) => t._id === teacherId);
-    if (!teacherItem) return;
+ const handleAddToList = (teacherId) => {
+  const teacherItem = teachers.find((t) => t._id === teacherId);
+  if (!teacherItem) return;
 
-    dispatch(
-      addTolist({
-        teacherEmail: teacherItem.email,
-        teacherId,
-      })
-    );
-    window.alert(`"${teacherItem.teacherName}" has been added to your list.`);
-  };
+  dispatch(
+    addTolist({
+      useremail: user.email,
+      teacheremail: teacherItem.email,
+    })
+  );
+  window.alert(`"${teacherItem.teacherName}" has been added to your list.`);
+};
 
   return (
     <div className="catalog-container">

@@ -1,101 +1,98 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-
+// Create a new booking
 export const createBook = createAsyncThunk(
-  "Book/createBook",
-  async (BoookData, thunkAPI) => {
+  "book/createBook",
+  async (bookData, thunkAPI) => {
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/createBook`, BoookData);
-      return res.data.Book;
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/createBook`, bookData);
+      return res.data.book;
     } catch (err) {
-      console.error("Create Book error:", err.response?.data || err.message);
-      return thunkAPI.rejectWithValue(err.response?.data || "Error placing Book");
+      return thunkAPI.rejectWithValue(err.response?.data || "Error placing booking");
     }
   }
 );
 
-// Get order history for a user
-export const getBookbyuser = createAsyncThunk(
-  "Book/getBookbyuser",
+// Get bookings by user
+export const getBookingsByUser = createAsyncThunk(
+  "book/getBookingsByUser",
   async (useremail, thunkAPI) => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/Book/${useremail}`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/book/${useremail}`);
       return res.data;
     } catch (err) {
-      console.error("Fetch Book history error:", err.response?.data || err.message);
-      return thunkAPI.rejectWithValue(err.response?.data || "Error fetching orders");
+      return thunkAPI.rejectWithValue(err.response?.data || "Error fetching bookings");
     }
   }
 );
 
-
-// Async thunk to fetch all orders for admin
-export const fetchAllOBook = createAsyncThunk(
-  'Book/fetchAllOBook',
+// Admin: Fetch all bookings
+export const fetchAllBookings = createAsyncThunk(
+  "book/fetchAllBookings",
   async (_, thunkAPI) => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/Book`); // updated route
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/book`);
       return res.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to fetch Book');
+      return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to fetch bookings");
     }
   }
 );
 
-
-const BookTeachSlice = createSlice({
-  name: "Book",
+const bookTeachSlice = createSlice({
+  name: "book",
   initialState: {
-    Book: null,
+    booking: null,
     status: "idle",
     error: null,
-    Booking: [],
+    bookingHistory: [],
+    loading: false,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Create Booking
       .addCase(createBook.pending, (state) => {
         state.status = "loading";
       })
       .addCase(createBook.fulfilled, (state, action) => {
-        state.Book = action.payload;
+        state.booking = action.payload;
         state.status = "succeeded";
       })
       .addCase(createBook.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       })
 
-      .addCase(getBookbyuser.pending, (state) => {
+      // Get Bookings By User
+      .addCase(getBookingsByUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getBookbyuser.fulfilled, (state, action) => {
-        state.BookHistory = action.payload;
+      .addCase(getBookingsByUser.fulfilled, (state, action) => {
+        state.bookingHistory = action.payload;
         state.loading = false;
       })
-      .addCase(getBookbyuser.rejected, (state, action) => {
+      .addCase(getBookingsByUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       })
 
-
-
-      .addCase(fetchAllOBook.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    })
-    .addCase(fetchAllOBook.fulfilled, (state, action) => {
-      state.Book = action.payload;
-      state.loading = false;
-    })
-    .addCase(fetchAllOBook.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload || action.error.message;
-    });
-      
+      // Fetch All Bookings
+      .addCase(fetchAllBookings.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllBookings.fulfilled, (state, action) => {
+        state.booking = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchAllBookings.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
   },
 });
 
-export default BookTeachSlice.reducer;
+export default bookTeachSlice.reducer;

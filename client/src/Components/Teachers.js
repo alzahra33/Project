@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getBookbyuser } from "../Features/BookTeachSlice";
+import { getBookingsByUser } from "../Features/BookTeachSlice";
 
 
 const Teachers = () => {
@@ -10,7 +10,7 @@ const Teachers = () => {
 
   useEffect(() => {
     if (user?._id) {
-      dispatch(getBookbyuser(user._id));
+      dispatch(getBookingsByUser(user._id));
     }
   }, [user, dispatch]);
 

@@ -1,11 +1,10 @@
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import moment from "moment";
 import { getTeachers, deleteTeachers } from "../Features/TeacherSlice";
 import { FaTrash } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
-
 
 const ManageTeachers = () => {
   const teachers = useSelector((state) => state.teachers.teachers);
@@ -19,35 +18,35 @@ const ManageTeachers = () => {
 
   return (
     <div className="catalog-container">
-      {teachers.map((teachers) => (
-        <div className="card" key={teachers._id}>
+      {teachers.map((teacher) => (
+        <div className="card" key={teacher.email}>
           <div className="image-container">
-            <img src={teachers.teachersImage} alt={teachers.teachersName} />
+            <img src={teacher.imageUrl} alt={teacher.name} />
           </div>
 
-          <h2 className="product-name">
-            {teachers.teachersName}
-          </h2>
-          <p className="description">email | {teachers.teachersemail}</p>
-          <p className="description">{teachers.teachersName}</p>
-          <p className="price">{teachers.coursePrice} OMR</p>
-          <p className="date">{moment(teachers.createdAt).fromNow()}</p>
+          <h2 className="product-name">{teacher.name}</h2>
+          <p className="description">Email: {teacher.email}</p>
+          <p className="description">Subject: {teacher.subject}</p>
+          <p className="price">{teacher.coursePrice} OMR</p>
+          <p className="date">{moment(teacher.createdAt).fromNow()}</p>
 
-          {/* أيقونات التعديل والحذف جنبًا إلى جنب */}
+          {/* Edit and Delete buttons */}
           <div className="action-buttons">
             <FiEdit
               className="edit-icon"
-              onClick={() => navigate(`/update-product/${teachers._id}`)}
-              title="Edit Product"
+              onClick={() => navigate(`/UpdateTeachers/${teacher.email}`)}
+              title="Edit Teacher"
             />
             <button
               className="delete-button"
               onClick={() => {
-                if (window.confirm("Are you sure you want to delete this product?")) {
-                  dispatch(deleteTeachers(teachers._id));
+                if (
+                  window.confirm("Are you sure you want to delete this teacher?")
+                ) {
+                  dispatch(deleteTeachers(teacher.email));
                 }
               }}
-              title="Delete Product"
+              title="Delete Teacher"
             >
               <FaTrash />
             </button>

@@ -47,6 +47,7 @@ const App = () => {
             <Route path="/UserTeachers" element={<UserTeachers />} />
              <Route path="/ManageTeachers" element={<ManageTeachers />} />
             <Route path="/UpdateTeachers/:email" element={<UpdateTeachers />} />
+
           </Routes>
         </Row>
         <Row>

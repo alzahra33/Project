@@ -8,20 +8,19 @@ import { updateTeacher } from "../Features/TeacherSlice";
 import { TeacherSchema } from "../Validations/TeachersValidations";
 import TeacherImage from "../Images/bg.png";
 
-const UpdateTeacher = () => {
-  const { id } = useParams();
+const UpdateTeacherPage = () => {
+  const { email } = useParams();
   const dispatch = useDispatch();
 
   // grab the list of teachers from the store
-  const { teachers } = useSelector((state) => state.teacher);
-  const teacherData = teachers.find((t) => t._id === id);
+  const { teachers } = useSelector((state) => state.teachers);
+  const teacherData = teachers.find((t) => t.email === email);
 
   // local state for success message
   const [successMsg, setSuccessMsg] = useState("");
 
   // form field state
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [coursePrice, setCoursePrice] = useState("");
@@ -40,15 +39,14 @@ const UpdateTeacher = () => {
   // on mount, prefill both state and RHF form fields
   useEffect(() => {
     if (!teacherData) return;
+
     setName(teacherData.name);
-    setEmail(teacherData.email);
     setSubject(teacherData.subject);
     setPhoneNumber(teacherData.phoneNumber);
     setCoursePrice(teacherData.coursePrice);
     setImageUrl(teacherData.imageUrl);
 
     setValue("name", teacherData.name);
-    setValue("email", teacherData.email);
     setValue("subject", teacherData.subject);
     setValue("phoneNumber", teacherData.phoneNumber);
     setValue("coursePrice", teacherData.coursePrice);
@@ -58,15 +56,13 @@ const UpdateTeacher = () => {
   const onSubmit = () => {
     const updatedData = {
       name,
-      email,
       subject,
       phoneNumber,
       coursePrice,
       imageUrl,
     };
 
-    // mirror product dispatch: send both ID and updatedData
-    dispatch(updateTeacher({ teacherId: teacherData._id, updatedData }))
+    dispatch(updateTeacher({ email, updatedData }))
       .then(() => {
         setSuccessMsg("Teacher updated successfully!");
         setTimeout(() => setSuccessMsg(""), 3000);
@@ -89,7 +85,10 @@ const UpdateTeacher = () => {
         </Col>
 
         <Col lg="6" className="d-flex align-items-center justify-content-center">
-          <form onSubmit={handleSubmit(onSubmit)} style={{ width: "80%", maxWidth: "500px" }}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            style={{ width: "80%", maxWidth: "500px" }}
+          >
             <h2 className="mb-4" style={{ fontWeight: "bold" }}>
               Update Teacher
             </h2>
@@ -108,20 +107,6 @@ const UpdateTeacher = () => {
                 value={name}
               />
               <p className="text-danger">{errors.name?.message}</p>
-            </div>
-
-            {/* Email */}
-            <div className="mb-3">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Email"
-                {...register("email", {
-                  onChange: (e) => setEmail(e.target.value),
-                })}
-                value={email}
-              />
-              <p className="text-danger">{errors.email?.message}</p>
             </div>
 
             {/* Subject */}
@@ -149,19 +134,21 @@ const UpdateTeacher = () => {
                 })}
                 value={phoneNumber}
               />
-              <p className="text-danger">{errors.coursePrice?.message}</p>
+              <p className="text-danger">{errors.phoneNumber?.message}</p>
             </div>
+
+            {/* Course Price */}
             <div className="mb-3">
               <input
                 type="text"
                 className="form-control"
-                placeholder="coursePrice"
+                placeholder="Course Price"
                 {...register("coursePrice", {
                   onChange: (e) => setCoursePrice(e.target.value),
                 })}
                 value={coursePrice}
               />
-              <p className="text-danger">{errors.phoneNumber?.message}</p>
+              <p className="text-danger">{errors.coursePrice?.message}</p>
             </div>
 
             {/* Image URL */}
@@ -188,4 +175,4 @@ const UpdateTeacher = () => {
   );
 };
 
-export default UpdateTeacher;
+export default UpdateTeacherPage;

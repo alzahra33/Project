@@ -17,7 +17,7 @@ import Teachers from "./Components/Teachers";
 import File from "./Components/File";
 import BookTeach from "./Components/BookTeach";
 import UserTeachers from "./Components/UserTeachers";
-
+import ManageTeachers from "./Components/ManageTeachers";
 
 const App = () => {
  
@@ -45,6 +45,7 @@ const App = () => {
             <Route path="/File" element={<File />} />
             <Route path="/BookTeach" element={<BookTeach />} />
             <Route path="/UserTeachers" element={<UserTeachers />} />
+             <Route path="/ManageTeachers" element={<ManageTeachers />} />
             <Route path="/UpdateTeachers/:email" element={<UpdateTeachers />} />
           </Routes>
         </Row>

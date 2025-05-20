@@ -63,6 +63,9 @@ const isUser = user?.role === "user";
               <Link to="/Teachers">
                     <Button style={buttonStyle}>Teachers</Button>
                   </Link>
+                  <Link to="/ManageTeachers">
+                    <Button style={buttonStyle}>ManageTeachers</Button>
+                  </Link>
             </>
           ) : (
             // Authenticated user views

@@ -35,7 +35,7 @@ export const getTeachers = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/getTeachers`);
-      return response.data.teachers || response.data.products;
+      return response.data.teachers || response.data.teachers;
     } catch (error) {
       console.error("getTeachers error:", error.response?.data || error.message);
       return thunkAPI.rejectWithValue("Failed to fetch teachers");

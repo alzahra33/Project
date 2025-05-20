@@ -1,25 +1,19 @@
 import React from "react";
-import { useState } from "react";
 import { Button, Navbar } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../Images/logo1.jpg";
 import { logout } from "../Features/UserSlice";
 import { useSelector, useDispatch } from "react-redux";
 import Location from './Location';
-import UserLogin from "./UserLogin";
-import OwnerLogin from "./OwnerLogin";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.users);
 
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/");
+    navigate("/login");
   };
 
 
@@ -86,7 +80,7 @@ const Header = () => {
                 </>
               )}
 
-              {isOwner && (
+              {isOwner&& (
                 <>
                   <Link to="/Profile">
                     <Button style={buttonStyle}>Profile</Button>
@@ -110,10 +104,7 @@ const Header = () => {
       <div>
         <Location />
       </div>
-       <UserLogin isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
-      <OwnerLogin isOpen={showRegisterModal} toggle={() => setShowRegisterModal(false)} />
     </div>
-    
   );
 };
 

@@ -33,8 +33,8 @@ const Header = () => {
     borderRadius: "8px",
   };
 
-  const isOwner = user?.role === "owner@gmail.com";
-  const isRegularUser = user?.role === "user@gmail.com";
+  const isOwner = user?.role === "owner";
+  const isRegularUser = user?.role === "user";
 
   return (
     <div className="shadow-sm">

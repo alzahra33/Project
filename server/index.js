@@ -209,9 +209,9 @@ app.put("/teachers/:email", async (req, res) => {
 });
 
 // ✅ Delete Teacher by ID
-app.delete("/deleteTeachers/:id", async (req, res) => {
+app.delete("/deleteTeachers/:email", async (req, res) => {
   try {
-    const deletedTeacher = await TeachersModel.findByIdAndDelete(req.params.id);
+    const deletedTeacher = await TeachersModel.findByIdAndDelete(req.params.email);
     if (!deletedTeacher) {
       return res.status(404).json({ success: false, message: "Teacher not found" });
     }
@@ -220,6 +220,27 @@ app.delete("/deleteTeachers/:id", async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+
+app.put("/updateTeachers/:email", async (req, res) => {
+  try {
+    const teachersemail = req.params.email;
+    const updatedteacher = await TeachersModel.findByIdAndUpdate(
+      teachersemail,
+      req.body,
+      { new: true } // Return the updated product
+    );
+
+    if (!updatedteacher) {
+      return res.status(404).json({ msg: "teachers not found" });
+    }
+
+    res.status(200).json({ teachers: updatedteacher, msg: "teachers updated successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update teachers" });
+  }
+});
+
 
 // ✅ Get All Teachers
 app.get("/teachers", async (req, res) => {

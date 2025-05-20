@@ -16,7 +16,6 @@ import AddTeachers from "./Components/AddTeachers"; // ✅ correct for default e
 import Teachers from "./Components/Teachers";
 import File from "./Components/File";
 import Booking from "./Components/Booking";
-import Posts from "./Components/Posts";
 import UserTeachers from "./Components/UserTeachers";
 
 
@@ -45,7 +44,6 @@ const App = () => {
             <Route path="/Teachers" element={<Teachers />} />
             <Route path="/File" element={<File />} />
             <Route path="/Booking" element={<Booking />} />
-            <Route path="/Posts" element={<Posts />} />
             <Route path="/UserTeachers" element={<UserTeachers />} />
             <Route path="/UpdateTeachers/:email" element={<UpdateTeachers />} />
           </Routes>

@@ -13,60 +13,44 @@ const UpdateTeacherPage = () => {
   const dispatch = useDispatch();
 
   // grab the list of teachers from the store
-  const { teachers } = useSelector((state) => state.teachers);
+  const { teachers, status } = useSelector((state) => state.teachers);
   const teacherData = teachers.find((t) => t.email === email);
 
   // local state for success message
   const [successMsg, setSuccessMsg] = useState("");
-
-  // form field state
-  const [name, setName] = useState("");
-  const [subject, setSubject] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [coursePrice, setCoursePrice] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
 
   // react-hook-form setup
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
+    reset,
   } = useForm({
     resolver: yupResolver(TeacherSchema),
   });
 
-  // on mount, prefill both state and RHF form fields
+  // on mount, prefill the form
   useEffect(() => {
-    if (!teacherData) return;
+    if (teacherData) {
+      reset({
+        name: teacherData.name,
+        subject: teacherData.subject,
+        phoneNumber: teacherData.phoneNumber,
+        coursePrice: teacherData.coursePrice,
+        imageUrl: teacherData.imageUrl,
+      });
+    }
+  }, [teacherData, reset]);
 
-    setName(teacherData.name);
-    setSubject(teacherData.subject);
-    setPhoneNumber(teacherData.phoneNumber);
-    setCoursePrice(teacherData.coursePrice);
-    setImageUrl(teacherData.imageUrl);
-
-    setValue("name", teacherData.name);
-    setValue("subject", teacherData.subject);
-    setValue("phoneNumber", teacherData.phoneNumber);
-    setValue("coursePrice", teacherData.coursePrice);
-    setValue("imageUrl", teacherData.imageUrl);
-  }, [teacherData, setValue]);
-
-  const onSubmit = () => {
-    const updatedData = {
-      name,
-      subject,
-      phoneNumber,
-      coursePrice,
-      imageUrl,
-    };
-
-    dispatch(updateTeacher({ email, updatedData }))
-      .then(() => {
+  // This is the only thing that matters for dispatch:
+  const onSubmit = (data) => {
+    // data === { name, subject, phoneNumber, coursePrice, imageUrl }
+    dispatch(updateTeacher({ email, updatedData: data })).then((action) => {
+      if (updateTeacher.fulfilled.match(action)) {
         setSuccessMsg("Teacher updated successfully!");
         setTimeout(() => setSuccessMsg(""), 3000);
-      });
+      }
+    });
   };
 
   if (!teacherData) {
@@ -83,16 +67,11 @@ const UpdateTeacherPage = () => {
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </Col>
-
         <Col lg="6" className="d-flex align-items-center justify-content-center">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            style={{ width: "80%", maxWidth: "500px" }}
-          >
+          <form onSubmit={handleSubmit(onSubmit)} style={{ width: "80%", maxWidth: "500px" }}>
             <h2 className="mb-4" style={{ fontWeight: "bold" }}>
               Update Teacher
             </h2>
-
             {successMsg && <Alert color="success">{successMsg}</Alert>}
 
             {/* Name */}
@@ -101,10 +80,7 @@ const UpdateTeacherPage = () => {
                 type="text"
                 className="form-control"
                 placeholder="Name"
-                {...register("name", {
-                  onChange: (e) => setName(e.target.value),
-                })}
-                value={name}
+                {...register("name")}
               />
               <p className="text-danger">{errors.name?.message}</p>
             </div>
@@ -112,13 +88,9 @@ const UpdateTeacherPage = () => {
             {/* Subject */}
             <div className="mb-3">
               <input
-                type="text"
                 className="form-control"
                 placeholder="Subject"
-                {...register("subject", {
-                  onChange: (e) => setSubject(e.target.value),
-                })}
-                value={subject}
+                {...register("subject")}
               />
               <p className="text-danger">{errors.subject?.message}</p>
             </div>
@@ -126,13 +98,9 @@ const UpdateTeacherPage = () => {
             {/* Phone Number */}
             <div className="mb-3">
               <input
-                type="text"
                 className="form-control"
                 placeholder="Phone Number"
-                {...register("phoneNumber", {
-                  onChange: (e) => setPhoneNumber(e.target.value),
-                })}
-                value={phoneNumber}
+                {...register("phoneNumber")}
               />
               <p className="text-danger">{errors.phoneNumber?.message}</p>
             </div>
@@ -140,13 +108,9 @@ const UpdateTeacherPage = () => {
             {/* Course Price */}
             <div className="mb-3">
               <input
-                type="text"
                 className="form-control"
                 placeholder="Course Price"
-                {...register("coursePrice", {
-                  onChange: (e) => setCoursePrice(e.target.value),
-                })}
-                value={coursePrice}
+                {...register("coursePrice")}
               />
               <p className="text-danger">{errors.coursePrice?.message}</p>
             </div>
@@ -154,19 +118,15 @@ const UpdateTeacherPage = () => {
             {/* Image URL */}
             <div className="mb-4">
               <input
-                type="text"
                 className="form-control"
                 placeholder="Image URL"
-                {...register("imageUrl", {
-                  onChange: (e) => setImageUrl(e.target.value),
-                })}
-                value={imageUrl}
+                {...register("imageUrl")}
               />
               <p className="text-danger">{errors.imageUrl?.message}</p>
             </div>
 
-            <Button type="submit" color="dark" className="w-100">
-              Update Now
+            <Button type="submit" color="dark" className="w-100" disabled={status === "loading"}>
+              {status === "loading" ? "Updating..." : "Update Now"}
             </Button>
           </form>
         </Col>

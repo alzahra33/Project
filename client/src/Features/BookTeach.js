@@ -1,110 +1,98 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  bookTeacher,
+  getUserBookings,
+  cancelBooking,
+  clearBookTeachError,
+} from "../features/bookTeach/bookTeachSlice";
 
-// Add a new teacher booking
-export const bookTeacher = createAsyncThunk(
-  "bookTeach/bookTeacher",
-  async ({ userId, teacherId }, { rejectWithValue }) => {
-    try {
-      const res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/bookTeacher`, {
-        userId,
-        teacherId,
-      });
-      return res.data.booking;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.error || "Failed to book teacher");
+const BookTeachPage = () => {
+  const dispatch = useDispatch();
+  const { bookings, status, error } = useSelector((state) => state.bookTeach);
+  // Assuming you have an auth slice with user info
+  const userId = useSelector((state) => state.auth.user?.id);
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(getUserBookings(userId));
     }
-  }
-);
+  }, [dispatch, userId]);
 
-// Get bookings for a specific user
-export const getUserBookings = createAsyncThunk(
-  "bookTeach/getUserBookings",
-  async (userId, { rejectWithValue }) => {
-    try {
-      const res = await axios.get(`${process.env.REACT_APP_SERVER_URL}/getBookings/${userId}`);
-      return res.data.bookings;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.error || "Failed to fetch bookings");
-    }
-  }
-);
+  const handleBook = (teacherId) => {
+    dispatch(bookTeacher({ userId, teacherId }));
+  };
 
-// Cancel a booking
-export const cancelBooking = createAsyncThunk(
-  "bookTeach/cancelBooking",
-  async ({ userId, teacherId }, { rejectWithValue }) => {
-    try {
-      const res = await axios.delete(`${process.env.REACT_APP_SERVER_URL}/cancelBooking`, {
-        data: { userId, teacherId },
-      });
-      return res.data.bookings;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.error || "Failed to cancel booking");
-    }
-  }
-);
+  const handleCancel = (teacherId) => {
+    dispatch(cancelBooking({ userId, teacherId }));
+  };
 
-// Initial State
-const initialState = {
-  bookings: [],
-  status: "idle",
-  error: null,
+  const handleClearError = () => {
+    dispatch(clearBookTeachError());
+  };
+
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">My Teacher Bookings</h1>
+
+      {error && (
+        <div className="bg-red-100 text-red-800 p-2 mb-4 rounded">
+          <p>{error}</p>
+          <button
+            onClick={handleClearError}
+            className="mt-2 text-sm underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {status === "loading" && <p>Loading...</p>}
+
+      {status === "succeeded" && bookings.length === 0 && (
+        <p>You have no bookings yet.</p>
+      )}
+
+      {status === "succeeded" && bookings.length > 0 && (
+        <ul className="space-y-2">
+          {bookings.map((booking) => (
+            <li
+              key={booking.teacherId}
+              className="p-4 border rounded flex justify-between items-center"
+            >
+              <div>
+                <p className="font-medium">Teacher ID: {booking.teacherId}</p>
+                <p className="text-sm text-gray-600">
+                  Booked on: {new Date(booking.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <button
+                onClick={() => handleCancel(booking.teacherId)}
+                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Cancel
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Example list of teachers to book against */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-2">Available Teachers</h2>
+        {/* This should ideally come from a getTeachers API call */}
+        {["teacher1", "teacher2", "teacher3"].map((tid) => (
+          <button
+            key={tid}
+            onClick={() => handleBook(tid)}
+            className="mr-2 mb-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Book {tid}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 };
 
-const bookTeachSlice = createSlice({
-  name: "bookTeach",
-  initialState,
-  reducers: {
-    clearBookTeachError(state) {
-      state.error = null;
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      // Book teacher
-      .addCase(bookTeacher.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(bookTeacher.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.bookings.push(action.payload);
-        state.error = null;
-      })
-      .addCase(bookTeacher.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
-
-      // Get user bookings
-      .addCase(getUserBookings.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(getUserBookings.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.bookings = action.payload;
-        state.error = null;
-      })
-      .addCase(getUserBookings.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      })
-
-      // Cancel booking
-      .addCase(cancelBooking.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(cancelBooking.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.bookings = action.payload;
-        state.error = null;
-      })
-      .addCase(cancelBooking.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
-      });
-  },
-});
-
-export const { clearBookTeachError } = bookTeachSlice.actions;
-export default bookTeachSlice.reducer;
+export default BookTeachPage;

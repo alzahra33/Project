@@ -50,7 +50,7 @@ const BookTeachSlice = createSlice({
     Book: null,
     status: "idle",
     error: null,
-    Book: [],
+    Booking: [],
   },
   reducers: {},
   extraReducers: (builder) => {

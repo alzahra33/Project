@@ -28,7 +28,7 @@ const Header = () => {
   };
 
   const isOwner = user?.role === "owner@gmail.com";
-  const isRegularUser = user?.role === "user@gmail.com";
+  const isUser = user?.role === "user@gmail.com";
 
   return (
     <div className="shadow-sm">
@@ -63,7 +63,7 @@ const Header = () => {
           ) : (
             // Authenticated user views
             <>
-              {isRegularUser && (
+              {isUser && (
                 <>
                   <Link to="/UserTeachers">
                     <Button style={buttonStyle}>UserTeachers</Button>

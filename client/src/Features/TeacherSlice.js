@@ -35,7 +35,7 @@ export const getTeachers = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/getTeachers`);
-      return response.data.teachers || response.data.teachers;
+      return response.data.teachers || [];
     } catch (error) {
       console.error("getTeachers error:", error.response?.data || error.message);
       return thunkAPI.rejectWithValue("Failed to fetch teachers");
@@ -83,7 +83,6 @@ const teacherSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Add Teacher
       .addCase(AddTeachers.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -97,7 +96,6 @@ const teacherSlice = createSlice({
         state.error = action.payload || action.error.message;
       })
 
-      // Get Teachers
       .addCase(getTeachers.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -111,7 +109,6 @@ const teacherSlice = createSlice({
         state.error = action.payload || action.error.message;
       })
 
-      // Like Teacher
       .addCase(liketeachers.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -129,7 +126,6 @@ const teacherSlice = createSlice({
         state.error = action.payload || action.error.message;
       })
 
-      // Delete Teacher
       .addCase(deleteTeachers.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -143,7 +139,6 @@ const teacherSlice = createSlice({
         state.error = action.payload || action.error.message;
       })
 
-      // Update Teacher
       .addCase(updateTeacher.pending, (state) => {
         state.status = "loading";
         state.error = null;

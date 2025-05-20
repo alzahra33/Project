@@ -24,6 +24,7 @@ const UpdateTeacher = () => {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [coursePrice, setCoursePrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
   // react-hook-form setup
@@ -43,12 +44,14 @@ const UpdateTeacher = () => {
     setEmail(teacherData.email);
     setSubject(teacherData.subject);
     setPhoneNumber(teacherData.phoneNumber);
+    setCoursePrice(teacherData.coursePrice);
     setImageUrl(teacherData.imageUrl);
 
     setValue("name", teacherData.name);
     setValue("email", teacherData.email);
     setValue("subject", teacherData.subject);
     setValue("phoneNumber", teacherData.phoneNumber);
+    setValue("coursePrice", teacherData.coursePrice);
     setValue("imageUrl", teacherData.imageUrl);
   }, [teacherData, setValue]);
 
@@ -58,6 +61,7 @@ const UpdateTeacher = () => {
       email,
       subject,
       phoneNumber,
+      coursePrice,
       imageUrl,
     };
 
@@ -144,6 +148,18 @@ const UpdateTeacher = () => {
                   onChange: (e) => setPhoneNumber(e.target.value),
                 })}
                 value={phoneNumber}
+              />
+              <p className="text-danger">{errors.coursePrice?.message}</p>
+            </div>
+            <div className="mb-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="coursePrice"
+                {...register("coursePrice", {
+                  onChange: (e) => setCoursePrice(e.target.value),
+                })}
+                value={coursePrice}
               />
               <p className="text-danger">{errors.phoneNumber?.message}</p>
             </div>

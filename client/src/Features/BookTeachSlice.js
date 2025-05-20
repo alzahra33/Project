@@ -1,48 +1,47 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const addToBookTeach = createAsyncThunk("Book/addToBookTeach", async ({ useremail, teacheremail }) => {
-  const res = await axios.post(`${process.env.REACT_APP_API_URL}/addToBookTeach`, { useremail, teacheremail });
-  return res.data.cart;
-  
-});
 
-export const getBookTeach = createAsyncThunk("Book/getBookTeach", async (useremail) => {
-  const res = await axios.get(`${process.env.REACT_APP_API_URL}/getBookTeach/${useremail}`);
-  return res.data;
-});
-
-export const updateteacherQuantity = createAsyncThunk(
-  "Book/updateteacherQuantity",
-  async ({ useremail, teacheremail, action }, { rejectWithValue }) => {
+export const createBook = createAsyncThunk(
+  "Book/createBook",
+  async (BoookData, thunkAPI) => {
     try {
-      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/updateteacherQuantity`, {
-        useremail,
-        teacheremail,
-        action,
-      });
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/createBook`, BoookData);
       return res.data.Book;
     } catch (err) {
-      return rejectWithValue(err.response.data.error);
+      console.error("Create Book error:", err.response?.data || err.message);
+      return thunkAPI.rejectWithValue(err.response?.data || "Error placing Book");
     }
   }
 );
 
-export const removeFromBook = createAsyncThunk(
-  "Book/removeFromBook",
-  async ({ useremail, productemail }, { rejectWithValue }) => {
+// Get order history for a user
+export const getBookbyuser = createAsyncThunk(
+  "Book/getBookbyuser",
+  async (useremail, thunkAPI) => {
     try {
-      const res = await axios.delete(`${process.env.REACT_APP_API_URL}/removeFromBook`, {
-        data: { useremail, productemail },
-      });
-      return res.data.Book;
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/Book/${useremail}`);
+      return res.data;
     } catch (err) {
-      return rejectWithValue(err.response.data.error);
+      console.error("Fetch Book history error:", err.response?.data || err.message);
+      return thunkAPI.rejectWithValue(err.response?.data || "Error fetching orders");
     }
   }
 );
 
 
+// Async thunk to fetch all orders for admin
+export const fetchAllOBook = createAsyncThunk(
+  'Book/fetchAllOBook',
+  async (_, thunkAPI) => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/Book`); // updated route
+      return res.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to fetch Book');
+    }
+  }
+);
 
 
 const BookTeachSlice = createSlice({
@@ -50,40 +49,53 @@ const BookTeachSlice = createSlice({
   initialState: {
     Book: null,
     status: "idle",
-    error: null, 
+    error: null,
+    Book: [],
   },
-  reducers: {
-    clearBookError(state) {
-      state.error = null; // Reducer to clear error
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(addToBookTeach.fulfilled, (state, action) => {
-        state.cart = action.payload;
-        state.error = null; // clear error on success
+      .addCase(createBook.pending, (state) => {
+        state.status = "loading";
       })
-      .addCase(addToBookTeach.fulfilled, (state, action) => {
-        state.cart = action.payload;
+      .addCase(createBook.fulfilled, (state, action) => {
+        state.Book = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(createBook.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
+      .addCase(getBookbyuser.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
-      .addCase(updateteacherQuantity.fulfilled, (state, action) => {
-        state.cart = action.payload;
-        state.error = null;
+      .addCase(getBookbyuser.fulfilled, (state, action) => {
+        state.BookHistory = action.payload;
+        state.loading = false;
       })
-      .addCase(updateteacherQuantity.rejected, (state, action) => {
-        //Handle errors from backend
-        state.error = action.error?.message || "Failed to update cart quantity";
+      .addCase(getBookbyuser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
       })
-      .addCase(removeFromBook.fulfilled, (state, action) => {
-        state.cart = action.payload;
-        state.error = null;
-      })
-      .addCase(removeFromBook.rejected, (state, action) => {
-        state.error = action.payload || "Failed to remove Book";
-      });
+
+
+
+      .addCase(fetchAllOBook.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(fetchAllOBook.fulfilled, (state, action) => {
+      state.Book = action.payload;
+      state.loading = false;
+    })
+    .addCase(fetchAllOBook.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || action.error.message;
+    });
+      
   },
 });
-export const { clearBookError } = BookTeachSlice.actions;
 
 export default BookTeachSlice.reducer;

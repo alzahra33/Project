@@ -209,7 +209,7 @@ app.put("/teachers/:email", async (req, res) => {
 });
 
 // ✅ Delete Teacher by ID
-app.delete("/teachers/:id", async (req, res) => {
+app.delete("/deleteTeachers/:id", async (req, res) => {
   try {
     const deletedTeacher = await TeachersModel.findByIdAndDelete(req.params.id);
     if (!deletedTeacher) {

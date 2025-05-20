@@ -1,64 +1,76 @@
-import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import moment from "moment";
-import { FaThumbsUp } from "react-icons/fa6";
-import { getTeachers, liketeachers } from "../Features/TeacherSlice";
-import { addTolist } from "../Features/ListSlice";
- 
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import moment from 'moment';
+import { FaThumbsUp } from 'react-icons/fa6';
+import { getTeachers, likeTeachers } from '../Features/TeacherSlice';
+import { addTolist } from './Features/ListSlice';
 
-const Catalog = () => {
-  const teacherslist = useSelector((state) => state.teachers.teachers);
-  const user = useSelector((state) => state.users.user);
-  const navigate = useNavigate();
+const ListTeachers = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const teachers = useSelector((state) => state.teachers.teachers);
+  const user = useSelector((state) => state.users.user);
 
   useEffect(() => {
     dispatch(getTeachers());
   }, [dispatch]);
 
-  const liketeachers = (teacheremail) => {
+  const handleLikeTeacher = (teacherId) => {
     const teacherData = {
-      teacheremail: teacheremail,
-      useremail: user._email,
+      teacherId,
+      userEmail: user.email,
     };
-    dispatch(liketeachers(teacherData));
-    navigate("/home");
+    dispatch(likeTeachers(teacherData));
+    navigate('/home');
   };
 
-  const handleAddToCart = (teacheremail) => {
-    const teachers = teachers.find((t) => t._email === teacheremail);
-    if (!teachers) return;
+  const handleAddToList = (teacherId) => {
+    const teacherItem = teachers.find((t) => t._id === teacherId);
+    if (!teacherItem) return;
 
-    dispatch(addToCart({ teacheremail: teachers.email, teacheremail }));
-    window.alert(`"${teachers.teachername}" has been added to your cart.`);
+    dispatch(
+      addTolist({
+        teacherEmail: teacherItem.email,
+        teacherId,
+      })
+    );
+    window.alert(`"${teacherItem.teacherName}" has been added to your list.`);
   };
 
   return (
     <div className="catalog-container">
-      {products.map((product) => (
-        <div className="card" key={product._id}>
+      {teachers.map((teacher) => (
+        <div className="card" key={teacher._id}>
           <div className="like">
-            <Link onClick={() => handleLikeProduct(product._id)}>
-              <FaThumbsUp style={{ color: "#ffa500", cursor: "pointer" }} />
+            <Link onClick={() => handleLikeTeacher(teacher._id)}>
+              <FaThumbsUp style={{ color: '#ffa500', cursor: 'pointer' }} />
             </Link>
-            {product.likes.count}
+            {teacher.likes?.count ?? 0}
           </div>
 
           <div className="image-container">
-            <img src={product.productImage} alt={product.productName} />
+            <img
+              src={teacher.teacherImage}
+              alt={teacher.teacherName}
+            />
           </div>
 
-          <h2 className="product-name">{product.productName}</h2>
-          <p className="description">{product.productDiscribtion}</p>
-          <p className="price">{product.productPrice} OMR</p>
-          <p className="date">In Stock {product.productQuantity}</p>
-          <p className="date">{moment(product.createdAt).fromNow()}</p>
-          <button className="add-to-cart" onClick={() => handleAddToCart(product._id)}>Add to Cart</button>
+          <h2 className="teacher-name">{teacher.teacherName}</h2>
+          <p className="description">{teacher.productDescription}</p>
+          <p className="price">{teacher.productPrice} OMR</p>
+          <p className="quantity">In Stock: {teacher.teacherQuantity}</p>
+          <p className="date">{moment(teacher.createdAt).fromNow()}</p>
+          <button
+            className="add-to-list"
+            onClick={() => handleAddToList(teacher._id)}
+          >
+            Add to list
+          </button>
         </div>
       ))}
     </div>
   );
 };
 
-export default Catalog;
+export default ListTeachers;

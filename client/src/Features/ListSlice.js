@@ -45,7 +45,7 @@ export const removeFromlist = createAsyncThunk(
 
 
 
-const cartSlice = createSlice({
+const ListSlice = createSlice({
   name: "list",
   initialState: {
     list: null,
@@ -84,6 +84,6 @@ const cartSlice = createSlice({
       });
   },
 });
-export const { clearlistError } = cartSlice.actions;
+export const { clearlistError } = ListSlice.actions;
 
-export default cartSlice.reducer;
+export default ListSlice.reducer;

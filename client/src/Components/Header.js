@@ -1,20 +1,28 @@
 import React from "react";
+import { useState } from "react";
 import { Button, Navbar } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../Images/logo1.jpg";
 import { logout } from "../Features/UserSlice";
 import { useSelector, useDispatch } from "react-redux";
 import Location from './Location';
+import UserLogin from "./UserLogin";
+import OwnerLogin from "./OwnerLogin";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.users);
 
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
   };
+
+
 
   const buttonStyle = {
     backgroundColor: "#2c3e50",
@@ -25,8 +33,8 @@ const Header = () => {
     borderRadius: "8px",
   };
 
-  const isOwner = user?.role === "owner";
-  const isRegularUser = user?.role === "user";
+  const isOwner = user?.role === "owner@gmail.com";
+  const isRegularUser = user?.role === "user@gmail.com";
 
   return (
     <div className="shadow-sm">
@@ -102,7 +110,10 @@ const Header = () => {
       <div>
         <Location />
       </div>
+       <UserLogin isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <OwnerLogin isOpen={showRegisterModal} toggle={() => setShowRegisterModal(false)} />
     </div>
+    
   );
 };
 

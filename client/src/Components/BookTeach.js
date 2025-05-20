@@ -1,78 +1,118 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addToBookTeach,
-  getBookTeach,
-  clearBookError,  // ✅ fixed name
-  removeFromBook   // ✅ added import
-} from "../Features/BookTeachSlice";
-import { useNavigate } from "react-router-dom";
-import moment from "moment";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-const BookTeachPage = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { bookings, status, error } = useSelector((state) => state.bookTeach);
-  const useremail = useSelector((state) => state.auth.user?.email); // ✅ defined
+const BASE_URL = process.env.REACT_APP_SERVER_URL;
 
-  useEffect(() => {
-    if (useremail) dispatch(getBookTeach(useremail));
-  }, [dispatch, useremail]);
-
-  useEffect(() => {
-    if (error) {
-      const timeout = setTimeout(() => dispatch(clearBookError()), 3000); // ✅ corrected delay
-      return () => clearTimeout(timeout);
+// Async thunk to book a teacher
+export const addToBookTeach = createAsyncThunk(
+  "Book/addToBookTeach",
+  async ({ useremail, teacheremail }, thunkAPI) => {
+    try {
+      const res = await axios.post(`${BASE_URL}/bookings`, {
+        useremail,
+        teacheremail,
+      });
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || "Booking failed"
+      );
     }
-  }, [error, dispatch]);
+  }
+);
 
-  const handleBook = (teacheremail) => dispatch(addToBookTeach({ useremail, teacheremail }));
-  const handleCancel = (teacheremail) => dispatch(removeFromBook({ useremail, teacheremail })); // ✅ fixed
+// Async thunk to get bookings for a user
+export const getBookTeach = createAsyncThunk(
+  "Book/getBookTeach",
+  async (useremail, thunkAPI) => {
+    try {
+      const res = await axios.get(`${BASE_URL}/bookings/${useremail}`);
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || "Failed to fetch bookings"
+      );
+    }
+  }
+);
 
-  if (status === "loading") return <p>Loading...</p>;
-  if (!bookings?.length)
-    return <p className="empty-message">You have no bookings yet.</p>;
+// Async thunk to remove a booking
+export const removeFromBook = createAsyncThunk(
+  "Book/removeFromBook",
+  async ({ useremail, teacheremail }, thunkAPI) => {
+    try {
+      await axios.delete(`${BASE_URL}/bookings`, {
+        data: { useremail, teacheremail },
+      });
+      return teacheremail;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || "Failed to cancel booking"
+      );
+    }
+  }
+);
 
-  return (
-    <div className="bookteach-container">
-      {error && <p className="error-message">{error}</p>}
+const bookTeachSlice = createSlice({
+  name: "bookTeach",
+  initialState: {
+    bookings: [],
+    status: "idle",
+    error: null,
+  },
+  reducers: {
+    clearBookError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
 
-      <div className="booking-list">
-        <h2>My Teacher Bookings</h2>
-        {bookings.map((booking) => (
-          <div className="booking-card" key={booking.teacheremail}>
-            <div className="booking-info">
-              <p className="teacher-id">Teacher Email: {booking.teacheremail}</p>
-              <p className="booked-on">
-                Booked on: {moment(booking.createdAt).format("LLL")}
-              </p>
-            </div>
-            <button
-              className="cancel-btn"
-              onClick={() => handleCancel(booking.teacheremail)} // ✅ fixed
-            >
-              Cancel
-            </button>
-          </div>
-        ))}
-      </div>
+      // Add to booking
+      .addCase(addToBookTeach.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(addToBookTeach.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.bookings.push(action.payload);
+      })
+      .addCase(addToBookTeach.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
 
-      <div className="available-section">
-        <h3>Available Teachers</h3>
-        <div className="available-buttons">
-          {["teacher1@gmail.com", "teacher2@gmail.com", "teacher3@gmail.com"].map((temail) => (
-            <button
-              key={temail}
-              className="book-btn"
-              onClick={() => handleBook(temail)}
-            >
-              Book {temail}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+      // Get bookings
+      .addCase(getBookTeach.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getBookTeach.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.bookings = action.payload;
+      })
+      .addCase(getBookTeach.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
 
-export default BookTeachPage;
+      // Remove booking
+      .addCase(removeFromBook.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(removeFromBook.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.bookings = state.bookings.filter(
+          (booking) => booking.teacheremail !== action.payload
+        );
+      })
+      .addCase(removeFromBook.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
+  },
+});
+
+export const { clearBookError } = bookTeachSlice.actions;
+export default bookTeachSlice.reducer;

@@ -224,7 +224,7 @@ app.delete("/deleteTeachers/:email", async (req, res) => {
 app.put("/updateTeachers/:email", async (req, res) => {
   try {
     const teachersemail = req.params.email;
-    const updatedteacher = await TeachersModel.findByIdAndUpdate(
+    const updatedteacher = await TeachersModel.findByemailAndUpdate(
       teachersemail,
       req.body,
       { new: true } // Return the updated product

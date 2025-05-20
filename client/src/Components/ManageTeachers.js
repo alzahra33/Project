@@ -18,8 +18,8 @@ const ManageTeachers = () => {
 
   return (
     <div className="catalog-container">
-      {teachers.map((teacher) => (
-        <div className="card" key={teacher.email}>
+      {teachers.map((teacher, index) => (
+        <div className="card" key={`${teacher.email}-${index}`}>
           <div className="image-container">
             <img src={teacher.imageUrl} alt={teacher.name} />
           </div>

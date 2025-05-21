@@ -10,7 +10,7 @@ export const AddTeachers = createAsyncThunk(
       return response.data.teacher || response.data.product;
     } catch (error) {
       console.error("AddTeachers error:", error.response?.data || error.message);
-      return thunkAPI.rejectWithValue(error.response?.data || "Failed to add teacher");
+      return thunkAPI.rejectWithValue("Failed to add teacher");
     }
   }
 );
@@ -49,7 +49,7 @@ export const updateTeacher = createAsyncThunk(
   async ({ email, updatedData }, thunkAPI) => {
     try {
       const response = await axios.put(`${process.env.REACT_APP_API_URL}/updateTeacher/${email}`, updatedData);
-      return response.data.teacher;
+      return response.data.teacher; // must match backend response key
     } catch (error) {
       console.error("updateTeacher error:", error.response?.data || error.message);
       return thunkAPI.rejectWithValue("Failed to update teacher");
@@ -57,12 +57,14 @@ export const updateTeacher = createAsyncThunk(
   }
 );
 
+
 // Delete teacher
 export const deleteTeachers = createAsyncThunk(
   "teachers/deleteTeachers",
   async (email, thunkAPI) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/deleteTeachers/${email}`);
+      const res = await axios.delete(`${process.env.REACT_APP_API_URL}/deleteTeachers/${email}`);
+      console.log("Deleted teacher from backend:", email);
       return email;
     } catch (error) {
       console.error("deleteTeachers error:", error.response?.data || error.message);
@@ -83,77 +85,26 @@ const teacherSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(AddTeachers.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
       .addCase(AddTeachers.fulfilled, (state, action) => {
-        state.status = "succeeded";
         state.teachers.unshift(action.payload);
       })
-      .addCase(AddTeachers.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload || action.error.message;
-      })
-
-      .addCase(getTeachers.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
       .addCase(getTeachers.fulfilled, (state, action) => {
-        state.status = "succeeded";
         state.teachers = action.payload;
       })
-      .addCase(getTeachers.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload || action.error.message;
-      })
-
-      .addCase(liketeachers.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
+      .addCase(updateTeacher.fulfilled, (state, action) => {
+        const index = state.teachers.findIndex(t => t.email === action.payload.email);
+        if (index !== -1) {
+          state.teachers[index] = action.payload;
+        }
       })
       .addCase(liketeachers.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        const updatedTeacher = action.payload;
-        const index = state.teachers.findIndex(t => t.email === updatedTeacher.email);
+        const index = state.teachers.findIndex(t => t.email === action.payload.email);
         if (index !== -1) {
-          state.teachers[index] = updatedTeacher;
+          state.teachers[index] = action.payload;
         }
-      })
-      .addCase(liketeachers.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload || action.error.message;
-      })
-
-      .addCase(deleteTeachers.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
       })
       .addCase(deleteTeachers.fulfilled, (state, action) => {
-        state.status = "succeeded";
         state.teachers = state.teachers.filter(t => t.email !== action.payload);
-      })
-      .addCase(deleteTeachers.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload || action.error.message;
-      })
-
-      .addCase(updateTeacher.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
-      })
-      .addCase(updateTeacher.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        const updatedTeacher = action.payload;
-        const index = state.teachers.findIndex(t => t.email === updatedTeacher.email);
-        if (index !== -1) {
-          state.teachers[index] = updatedTeacher;
-        }
-      })
-      .addCase(updateTeacher.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload || action.error.message;
       });
   },
 });

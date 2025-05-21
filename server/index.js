@@ -211,35 +211,37 @@ app.put("/teachers/:email", async (req, res) => {
 // ✅ Delete Teacher by ID
 app.delete("/deleteTeachers/:email", async (req, res) => {
   try {
-    const deletedTeacher = await TeachersModel.findByIdAndDelete(req.params.email);
+    const deletedTeacher = await TeachersModel.findOneAndDelete({ email: req.params.email });
+    
     if (!deletedTeacher) {
       return res.status(404).json({ success: false, message: "Teacher not found" });
     }
-    res.status(200).json({ success: true, message: "Teacher deleted successfully" });
+
+    res.status(200).json({ success: true, message: "Teacher deleted successfully", email: req.params.email });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
+
 app.put("/updateTeachers/:email", async (req, res) => {
   try {
     const teachersemail = req.params.email;
-    const updatedteacher = await TeachersModel.findByemailAndUpdate(
-      teachersemail,
+    const updatedteacher = await TeachersModel.findOneAndUpdate(
+      { email: teachersemail },
       req.body,
-      { new: true } // Return the updated product
+      { new: true }
     );
-
     if (!updatedteacher) {
-      return res.status(404).json({ msg: "teachers not found" });
+      return res.status(404).json({ msg: "Teacher not found" });
     }
-
-    res.status(200).json({ teachers: updatedteacher, msg: "teachers updated successfully." });
+    res.status(200).json({ teacher: updatedteacher, msg: "Teacher updated successfully." });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to update teachers" });
+    res.status(500).json({ error: "Failed to update teacher" });
   }
 });
+
 
 
 // ✅ Get All Teachers

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTeacher, getTeachers } from "../Features/TeacherSlice";
+import "./UpdateTeachers.css"; // import the CSS file
 
 const UpdateTeachers = () => {
   const { email } = useParams();
@@ -17,11 +18,9 @@ const UpdateTeachers = () => {
   });
 
   useEffect(() => {
-    // If teachers not loaded, fetch them first
     if (!teachers.length) {
       dispatch(getTeachers());
     } else {
-      // Find the teacher to update and prefill form
       const teacher = teachers.find((t) => t.email === email);
       if (teacher) {
         setFormData({
@@ -54,11 +53,12 @@ const UpdateTeachers = () => {
 
   return (
     <div className="update-teacher-container">
-      <h2>Update Teacher: {email}</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
+      <h2 className="update-teacher-title">Update Teacher: {email}</h2>
+      <form onSubmit={handleSubmit} className="update-teacher-form">
+        <label className="form-label">
           Name:
           <input
+            className="form-input"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -66,9 +66,10 @@ const UpdateTeachers = () => {
           />
         </label>
 
-        <label>
+        <label className="form-label">
           Subject:
           <input
+            className="form-input"
             name="subject"
             value={formData.subject}
             onChange={handleChange}
@@ -76,27 +77,30 @@ const UpdateTeachers = () => {
           />
         </label>
 
-        <label>
+        <label className="form-label">
           Course Price:
           <input
+            className="form-input"
             name="coursePrice"
             type="number"
             value={formData.coursePrice}
             onChange={handleChange}
             required
+            min="0"
           />
         </label>
 
-        <label>
+        <label className="form-label">
           Image URL:
           <input
+            className="form-input"
             name="imageUrl"
             value={formData.imageUrl}
             onChange={handleChange}
           />
         </label>
 
-        <button type="submit">Update Teacher</button>
+        <button type="submit" className="update-button">Update Teacher</button>
       </form>
     </div>
   );

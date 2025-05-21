@@ -6,16 +6,21 @@ import { getTeachers, deleteTeachers } from "../Features/TeacherSlice";
 import { FaTrash } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 
-
 const ManageTeachers = () => {
   const teachers = useSelector((state) => state.teachers.teachers);
-  const users = useSelector((state) => state.users.user);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getTeachers());
   }, [dispatch]);
+
+  const handleDelete = (email) => {
+    if (window.confirm("Are you sure you want to delete this teacher?")) {
+      console.log("Deleting teacher with email:", email);
+      dispatch(deleteTeachers(email));
+    }
+  };
 
   return (
     <div className="catalog-container">
@@ -31,7 +36,6 @@ const ManageTeachers = () => {
           <p className="price">{teacher.coursePrice} OMR</p>
           <p className="date">{moment(teacher.createdAt).fromNow()}</p>
 
-          {/* Edit and Delete buttons */}
           <div className="action-buttons">
             <FiEdit
               className="edit-icon"
@@ -40,13 +44,7 @@ const ManageTeachers = () => {
             />
             <button
               className="delete-button"
-              onClick={() => {
-                if (
-                  window.confirm("Are you sure you want to delete this teacher?")
-                ) {
-                  dispatch(deleteTeachers(teacher.email));
-                }
-              }}
+              onClick={() => handleDelete(teacher.email)}
               title="Delete Teacher"
             >
               <FaTrash />

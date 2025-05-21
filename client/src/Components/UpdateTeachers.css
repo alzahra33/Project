@@ -1,0 +1,62 @@
+.update-teacher-container {
+  max-width: 450px;
+  margin: 40px auto;
+  padding: 25px 30px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.update-teacher-title {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  color: #333;
+  font-weight: 600;
+}
+
+.update-teacher-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  margin-bottom: 18px;
+  font-weight: 500;
+  color: #444;
+  font-size: 1rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  font-size: 1rem;
+  border: 1.8px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+.update-button {
+  margin-top: 25px;
+  padding: 12px 0;
+  background-color: #007bff;
+  border: none;
+  border-radius: 7px;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.update-button:hover {
+  background-color: #0056b3;
+}

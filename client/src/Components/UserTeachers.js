@@ -32,7 +32,7 @@ const BookTeachers = () => {
       return;
     }
 
-    navigate("/booking-confirmation", {
+    navigate("/BookTeach", {
       state: {
         teacher: {
           name: teacher.name,

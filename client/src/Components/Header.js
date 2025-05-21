@@ -116,9 +116,12 @@ const Header = () => {
                   
                 </>
               )}
-              <Button style={buttonStyle} onClick={handleLogout}>
-                Logout
-              </Button>
+              <button
+                  className="btn btn-outline-danger btn-sm w-100"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
             </>
           )}
         </div>

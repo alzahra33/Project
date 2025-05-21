@@ -285,31 +285,32 @@ app.get("/posts", async (req, res) => {
 });
 
 // ✅ Like/Unlike Post
-app.put("/posts/like/:postId", async (req, res) => {
-  const { postId } = req.params;
-  const { userId } = req.body;
+app.put("/liketeachers/:email", async (req, res) => {
+  const { email } = req.params;
+  const { useremail } = req.body;
 
   try {
-    const post = await PostModel.findById(postId);
-    if (!post) return res.status(404).json({ msg: "Post not found." });
+    const teacher = await TeacherModel.findOne({ email });
+    if (!teacher) return res.status(404).json({ msg: "Teacher not found." });
 
-    const hasLiked = post.likes.users.includes(userId);
+    const hasLiked = teacher.likes.users.includes(useremail);
 
     const update = hasLiked
       ? {
           $inc: { "likes.count": -1 },
-          $pull: { "likes.users": userId },
+          $pull: { "likes.users": useremail },
         }
       : {
           $inc: { "likes.count": 1 },
-          $addToSet: { "likes.users": userId },
+          $addToSet: { "likes.users": useremail },
         };
 
-    const updatedPost = await PostModel.findByIdAndUpdate(postId, update, { new: true });
+    const updatedTeacher = await TeacherModel.findOneAndUpdate({ email }, update, { new: true });
 
-    res.json({ post: updatedPost, msg: hasLiked ? "Post unliked." : "Post liked." });
+    res.json({ teacher: updatedTeacher, msg: hasLiked ? "Teacher unliked." : "Teacher liked." });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "An error occurred" });
   }
 });
+

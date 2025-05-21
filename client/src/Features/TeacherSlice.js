@@ -20,14 +20,18 @@ export const liketeachers = createAsyncThunk(
   "teachers/liketeachers",
   async ({ email, useremail }, thunkAPI) => {
     try {
-      const response = await axios.put(`${process.env.REACT_APP_API_URL}/liketeachers/${email}`, { useremail });
-      return response.data.teacher;
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/liketeachers/${email}`,
+        { useremail }
+      );
+      return response.data.teacher; // matches backend now
     } catch (error) {
       console.error("liketeachers error:", error.response?.data || error.message);
       return thunkAPI.rejectWithValue("Failed to like teacher");
     }
   }
 );
+
 
 // Get all teachers
 export const getTeachers = createAsyncThunk(
@@ -44,11 +48,10 @@ export const getTeachers = createAsyncThunk(
 );
 
 // Update teacher
-export const updateTeacher = createAsyncThunk(
-  "teachers/updateTeacher",
+export const updateTeacher = createAsyncThunk("teachers/updateTeacher",
   async ({ email, updatedData }, thunkAPI) => {
     try {
-      const response = await axios.put(`${process.env.REACT_APP_API_URL}/updateTeacher/${email}`, updatedData);
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/updateTeachers/${email}`, updatedData);
       return response.data.teacher; // must match backend response key
     } catch (error) {
       console.error("updateTeacher error:", error.response?.data || error.message);
@@ -97,12 +100,16 @@ const teacherSlice = createSlice({
           state.teachers[index] = action.payload;
         }
       })
-      .addCase(liketeachers.fulfilled, (state, action) => {
-        const index = state.teachers.findIndex(t => t.email === action.payload.email);
-        if (index !== -1) {
-          state.teachers[index] = action.payload;
-        }
-      })
+      
+  builder.addCase(liketeachers.fulfilled, (state, action) => {
+    const updatedTeacher = action.payload;
+    const index = state.teachers.findIndex(t => t.email === updatedTeacher.email);
+    if (index !== -1) {
+      state.teachers[index] = updatedTeacher;
+    }
+  })
+
+
       .addCase(deleteTeachers.fulfilled, (state, action) => {
         state.teachers = state.teachers.filter(t => t.email !== action.payload);
       });

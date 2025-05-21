@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getTeachers } from "../Features/TeacherSlice";
 import { useNavigate } from "react-router-dom";
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import "./UserTeachers.css";
 
 const BookTeachers = () => {
   const teachers = useSelector((state) => state.teachers.teachers);
   const dispatch = useDispatch();
   const [bookingData, setBookingData] = useState({});
+  const [evaluations, setEvaluations] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,8 +21,7 @@ const BookTeachers = () => {
       ...prev,
       [email]: {
         hours,
-        totalPrice:
-          teachers.find((t) => t.email === email).coursePrice * hours,
+        totalPrice: teachers.find((t) => t.email === email).coursePrice * hours,
       },
     }));
   };
@@ -38,12 +39,39 @@ const BookTeachers = () => {
           name: teacher.name,
           email: teacher.email,
           subject: teacher.subject,
+          phoneNumber: teacher.phoneNumber,
           imageUrl: teacher.imageUrl,
           pricePerHour: teacher.coursePrice,
         },
         hours: data.hours,
         totalPrice: data.totalPrice,
       },
+    });
+  };
+
+  const handleLike = (email) => {
+    setEvaluations((prev) => {
+      const current = prev[email] || { like: false, dislike: false };
+      return {
+        ...prev,
+        [email]: {
+          like: !current.like,
+          dislike: current.like ? current.dislike : false,
+        },
+      };
+    });
+  };
+
+  const handleDislike = (email) => {
+    setEvaluations((prev) => {
+      const current = prev[email] || { like: false, dislike: false };
+      return {
+        ...prev,
+        [email]: {
+          like: current.dislike ? current.like : false,
+          dislike: !current.dislike,
+        },
+      };
     });
   };
 
@@ -54,6 +82,7 @@ const BookTeachers = () => {
           <img src={teacher.imageUrl} alt={teacher.name} />
           <h3>{teacher.name}</h3>
           <p>Subject: {teacher.subject}</p>
+          <p>phoneNumber: {teacher.phoneNumber}</p>
           <p>Price per hour: {teacher.coursePrice} OMR</p>
 
           <input
@@ -73,10 +102,20 @@ const BookTeachers = () => {
               : "0 OMR"}
           </p>
 
-          <button
-            className="book-button"
-            onClick={() => handleBooking(teacher)}
-          >
+          <div className="evaluation-buttons">
+            <FaThumbsUp
+              className={`like-icon ${evaluations[teacher.email]?.like ? "active" : ""}`}
+              onClick={() => handleLike(teacher.email)}
+              title="Like"
+            />
+            <FaThumbsDown
+              className={`dislike-icon ${evaluations[teacher.email]?.dislike ? "active" : ""}`}
+              onClick={() => handleDislike(teacher.email)}
+              title="Dislike"
+            />
+          </div>
+
+          <button className="book-button" onClick={() => handleBooking(teacher)}>
             Book Now
           </button>
         </div>

@@ -8,8 +8,8 @@
   
   .card {
     background-color: #fff;
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 6px;
+    padding: 6px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     position: relative;
     display: flex;
@@ -27,15 +27,12 @@
     gap: 4px;
   }
   
-  .image-container {
-    background-color: #fefefe;
-    padding: 10px;
-    border-radius: 8px;
-    height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+ .image-container img {
+  width: 50px;   /* adjust width as needed */
+  height: auto;   /* maintain aspect ratio */
+  object-fit: cover;  /* crop if necessary */
+  border-radius: 8px; /* optional: rounded corners */
+}
   
   .image-container img {
     max-width: 100%;
@@ -91,7 +88,7 @@
 
 .edit-icon {
   color: #0097a7;
-  font-size: 20px;
+  font-size: 14px;
   cursor: pointer;
   transition: transform 0.2s;
 }
@@ -114,3 +111,5 @@
   color: #d11a2a;
   transform: scale(1.1);
 }
+
+

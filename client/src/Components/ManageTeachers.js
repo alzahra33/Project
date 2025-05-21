@@ -5,6 +5,7 @@ import moment from "moment";
 import { getTeachers, deleteTeachers } from "../Features/TeacherSlice";
 import { FaTrash } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
+import "./Manage.css";
 
 const ManageTeachers = () => {
   const teachers = useSelector((state) => state.teachers.teachers);
@@ -23,18 +24,23 @@ const ManageTeachers = () => {
   };
 
   return (
-    <div className="catalog-container">
-      {teachers.map((teacher, index) => (
+  <div className="catalog-container">
+    {teachers.map((teacher, index) => {
+      if (!teacher) return null; // Skip if teacher is undefined/null
+
+      return (
         <div className="card" key={`${teacher.email}-${index}`}>
           <div className="image-container">
-            <img src={teacher.imageUrl} alt={teacher.name} />
+            {/* Provide fallback image if imageUrl is missing */}
+            <img src={teacher.imageUrl || "/default-teacher.png"} alt={teacher.name || "Teacher"} />
           </div>
 
-          <h2 className="product-name">{teacher.name}</h2>
-          <p className="description">Email: {teacher.email}</p>
-          <p className="description">Subject: {teacher.subject}</p>
-          <p className="price">{teacher.coursePrice} OMR</p>
-          <p className="date">{moment(teacher.createdAt).fromNow()}</p>
+          <h2 className="product-name">{teacher.name || "No Name"}</h2>
+          <p className="description">Email: {teacher.email || "N/A"}</p>
+          <p className="description">Subject: {teacher.subject || "N/A"}</p>
+          <p className="description">phoneNumber: {teacher.phoneNumber || "N/A"}</p>
+          <p className="price">{teacher.coursePrice ?? "N/A"} OMR</p>
+          <p className="date">{teacher.createdAt ? moment(teacher.createdAt).fromNow() : "Unknown date"}</p>
 
           <div className="action-buttons">
             <FiEdit
@@ -51,9 +57,10 @@ const ManageTeachers = () => {
             </button>
           </div>
         </div>
-      ))}
-    </div>
-  );
+      );
+    })}
+  </div>
+);
 };
 
 export default ManageTeachers;

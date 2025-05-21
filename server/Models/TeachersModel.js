@@ -7,6 +7,11 @@ const teacherSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true },
   coursePrice: { type: Number, required: true },
   imageUrl: { type: String, required: true },
+  likes: {
+  count: { type: Number, default: 0 },
+  users: [{ type: String }] // array of user emails or IDs who liked
+}
+
 });
 
 const TeachersModel = mongoose.model("teachers", teacherSchema);

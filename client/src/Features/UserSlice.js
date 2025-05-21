@@ -79,6 +79,7 @@ export const UserSlice = createSlice({
   initialState,  // initial value of the state
   reducers: {},  // Handling synchronous Operations
   extraReducers: (builder) => {
+    
     builder
       .addCase(UserRegister.pending, (state) => {
         state.status = "loading";
@@ -108,18 +109,19 @@ export const UserSlice = createSlice({
         state.msg = action.payload.msg;
       })
       .addCase(logout.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(logout.fulfilled, (state, action) => {
-        state.isLogin = false;
-        state.user = null;
-        state.msg = action.payload.msg;          
-      })
-      .addCase(logout.rejected, (state) => {
-        state.isError = true
-      });
+              state.isLoading = true;
+            })
+            .addCase(logout.fulfilled, (state, action) => {
+              state.isLogin = false;
+              state.user = null;
+              state.msg = action.payload.msg;          
+            })
+            .addCase(logout.rejected, (state) => {
+              state.isError = true
+            });
               
   }, // Handling asynchronous Operations
 });
+
 
 export default UserSlice.reducer;

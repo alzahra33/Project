@@ -1,22 +1,30 @@
-import React from "react";
-import { Button, Navbar } from "reactstrap";
+import React, { useState } from "react";
+import { Navbar, Button } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../Images/logo1.jpg";
-import { logout } from "../Features/UserSlice";
 import { useSelector, useDispatch } from "react-redux";
-import Location from './Location';
+import { logout } from "../Features/UserSlice";
+import Location from "./Location";
+import UserLogin from "./UserLogin";
+import OwnerLogin from "./OwnerLogin";
+import UserRegister from "./UserRegister";
+import OwnerRegister from "./OwnerRigester";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.users);
 
+  // Separate states for different modals
+  const [showUserLogin, setShowUserLogin] = useState(false);
+  const [showOwnerLogin, setShowOwnerLogin] = useState(false);
+  const [showUserRegister, setShowUserRegister] = useState(false);
+  const [showOwnerRegister, setShowOwnerRegister] = useState(false);
+
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate("/");
   };
-
-
 
   const buttonStyle = {
     backgroundColor: "#2c3e50",
@@ -28,8 +36,7 @@ const Header = () => {
   };
 
   const isOwner = user?.role === "owner";
-const isUser = user?.role === "user";
- 
+  const isUser = user?.role === "user";
 
   return (
     <div className="shadow-sm">
@@ -52,61 +59,63 @@ const isUser = user?.role === "user";
 
         <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
           {!user ? (
-            // Guest: show login buttons
             <>
-              <Link to="/UserLogin">
-                <Button style={buttonStyle}>UserLogin</Button>
+             
+              
+              <Link to="/ManageTeachers">
+                <Button style={buttonStyle}>Manage Teachers</Button>
               </Link>
-              <Link to="/OwnerLogin">
-                <Button style={buttonStyle}>OwnerLogin</Button>
+              <Link to="/UserTeachers">
+                <Button style={buttonStyle}>User Teachers</Button>
               </Link>
-              <Link to="/Teachers">
-                    <Button style={buttonStyle}>Teachers</Button>
+              <Link to="/AddTeachers">
+                <Button style={buttonStyle}>Add Teachers</Button>
+              </Link>
+              <Link to="/UserRegister">
+                    <Button style={buttonStyle}>UserRegister</Button>
                   </Link>
-                  <Link to="/ManageTeachers">
-                    <Button style={buttonStyle}>ManageTeachers</Button>
+                  <Link to="/UserLogin">
+                    <Button style={buttonStyle}>UserLogin</Button>
                   </Link>
-                  <Link to="/UserTeachers">
-                    <Button style={buttonStyle}>UserTeachers</Button>
+                  <Link to="/OwnerLogin">
+                    <Button style={buttonStyle}>OwnerLogin</Button>
                   </Link>
-                  <Link to="/AddTeachers">
-                    <Button style={buttonStyle}>AddTeachers</Button>
+                  <Link to="/OwnerRegister">
+                    <Button style={buttonStyle}>OwnerRegister</Button>
+                  </Link>
+                  <Link to="/Profile">
+                    <Button style={buttonStyle}>Profile</Button>
                   </Link>
             </>
           ) : (
-            // Authenticated user views
             <>
               {isUser && (
                 <>
                   <Link to="/UserTeachers">
-                    <Button style={buttonStyle}>UserTeachers</Button>
+                    <Button style={buttonStyle}>User Teachers</Button>
+                  </Link>
+                  <Link to="/UserRegister">
+                    <Button style={buttonStyle}>UserRegister</Button>
                   </Link>
                   <Link to="/BookTeach">
-                    <Button style={buttonStyle}>BookTeachers</Button>
-                  </Link>
-                  <Link to="/Posts">
-                    <Button style={buttonStyle}>PostParticipate</Button>
+                    <Button style={buttonStyle}>Book Teachers</Button>
                   </Link>
                   <Link to="/Profile">
                     <Button style={buttonStyle}>Profile</Button>
                   </Link>
                 </>
               )}
-
-              {isOwner&& (
+              {isOwner && (
                 <>
                   <Link to="/Profile">
                     <Button style={buttonStyle}>Profile</Button>
                   </Link>
-                  <Link to="/Teachers">
-                    <Button style={buttonStyle}>Teachers</Button>
-                  </Link>
-                  <Link to="/Posts">
-                    <Button style={buttonStyle}>PostParticipate</Button>
-                  </Link>
+                  <Link to="/ManageTeachers">
+                <Button style={buttonStyle}>Manage Teachers</Button>
+              </Link>
+                  
                 </>
               )}
-
               <Button style={buttonStyle} onClick={handleLogout}>
                 Logout
               </Button>
@@ -114,9 +123,15 @@ const isUser = user?.role === "user";
           )}
         </div>
       </Navbar>
-      <div>
-        <Location />
-      </div>
+
+      {/* Location always visible */}
+      <Location />
+
+      {/* Modals */}
+      <UserLogin isOpen={showUserLogin} onClose={() => setShowUserLogin(true)} />
+      <OwnerLogin isOpen={showOwnerLogin} onClose={() => setShowOwnerLogin(true)} />
+      <UserRegister isOpen={showUserRegister} onClose={() => setShowUserRegister(true)} />
+      <OwnerRegister isOpen={showOwnerRegister} onClose={() => setShowOwnerRegister(true)} />
     </div>
   );
 };

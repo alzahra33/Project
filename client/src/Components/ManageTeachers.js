@@ -6,6 +6,7 @@ import { getTeachers, deleteTeachers } from "../Features/TeacherSlice";
 import { FaTrash } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 
+
 const ManageTeachers = () => {
   const teachers = useSelector((state) => state.teachers.teachers);
   const users = useSelector((state) => state.users.user);

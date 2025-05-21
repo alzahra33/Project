@@ -1,0 +1,22 @@
+.booking-section {
+  margin-top: 1rem;
+}
+
+.hour-input {
+  padding: 0.4rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.book-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.book-button:hover {
+  background-color: #388e3c;
+}

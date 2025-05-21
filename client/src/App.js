@@ -14,10 +14,10 @@ import UpdateTeachers from "./Components/UpdateTeachers";
 import Profile from "./Components/Profile";
 import AddTeachers from "./Components/AddTeachers"; // ✅ correct for default export
 import Teachers from "./Components/Teachers";
-import File from "./Components/File";
 import BookTeach from "./Components/BookTeach";
 import UserTeachers from "./Components/UserTeachers";
 import ManageTeachers from "./Components/ManageTeachers";
+
 
 const App = () => {
  
@@ -42,7 +42,6 @@ const App = () => {
             <Route path="/Profile" element={<Profile />} />
             <Route path="/AddTeachers" element={<AddTeachers />} />
             <Route path="/Teachers" element={<Teachers />} />
-            <Route path="/File" element={<File />} />
             <Route path="/BookTeach" element={<BookTeach />} />
             <Route path="/UserTeachers" element={<UserTeachers />} />
              <Route path="/ManageTeachers" element={<ManageTeachers />} />

@@ -1,37 +1,27 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getBookingsByUser } from "../Features/BookTeachSlice";
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
+const BookingConfirmation = () => {
+  const { state } = useLocation();
+  const navigate = useNavigate();
 
-const BookTeachers = () => {
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.users.user);
-  const { bookingHistory, loading } = useSelector((state) => state.bookings); // Ensure state.bookings exists
+  if (!state) return <p>No booking data found.</p>;
 
-  useEffect(() => {
-    if (user?._id) {
-      dispatch(getBookingsByUser(user._id));
-    }
-  }, [user, dispatch]);
-
-  if (loading) return <p>Loading bookings...</p>;
-  if (!bookingHistory?.length) return <p>No teacher bookings found.</p>;
+  const { teacher, hours, totalPrice } = state;
 
   return (
-    <div className="bookings-container">
-      {bookingHistory.map((booking) => (
-        <div className="booking-card" key={booking._id}>
-          <h2 className="booking-title">Teacher Booking Info</h2>
-          <p><strong>Name:</strong> {booking.name}</p>
-          <p><strong>Email:</strong> {booking.email}</p>
-          <p><strong>Phone Number:</strong> {booking.phoneNumber}</p>
-          <p><strong>Subject:</strong> {booking.subject}</p>
-          <p><strong>Course Price:</strong> {booking.coursePrice} OMR</p>
-          <p><strong>Image URL:</strong> <a href={booking.imageUrl} target="_blank" rel="noopener noreferrer">{booking.imageUrl}</a></p>
-        </div>
-      ))}
+    <div className="confirmation-container">
+      <h2>Booking Confirmation</h2>
+      <img src={teacher.imageUrl} alt={teacher.name} width="200" />
+      <p><strong>Name:</strong> {teacher.name}</p>
+      <p><strong>Email:</strong> {teacher.email}</p>
+      <p><strong>Subject:</strong> {teacher.subject}</p>
+      <p><strong>Price/Hour:</strong> {teacher.pricePerHour} OMR</p>
+      <p><strong>Hours:</strong> {hours}</p>
+      <p><strong>Total:</strong> {totalPrice} OMR</p>
+      <button onClick={() => navigate("/UserTeachers")}>Back to Home</button>
     </div>
   );
 };
 
-export default BookTeachers;
+export default BookingConfirmation;

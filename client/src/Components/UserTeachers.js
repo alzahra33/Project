@@ -1,127 +1,90 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getTeachers } from "../Features/TeacherSlice";
+import { getTeachers, liketeachers } from "../Features/TeacherSlice";
+import { FaThumbsUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-import "./UserTeachers.css";
+import moment from "moment";
+import "./Manage.css"; // Or a separate UserTeachers.css
 
-const BookTeachers = () => {
-  const teachers = useSelector((state) => state.teachers.teachers);
+const UserTeachers = () => {
   const dispatch = useDispatch();
-  const [bookingData, setBookingData] = useState({});
-  const [evaluations, setEvaluations] = useState({});
   const navigate = useNavigate();
+  const teachers = useSelector((state) => state.teachers.teachers);
+  const useremail = useSelector((state) => state.auth?.user?.email); // Prevent crash if auth is undefined
 
   useEffect(() => {
     dispatch(getTeachers());
   }, [dispatch]);
 
-  const handleHourChange = (email, hours) => {
-    setBookingData((prev) => ({
-      ...prev,
-      [email]: {
-        hours,
-        totalPrice: teachers.find((t) => t.email === email).coursePrice * hours,
-      },
-    }));
-  };
-
-  const handleBooking = (teacher) => {
-    const data = bookingData[teacher.email];
-    if (!data?.hours || data.hours <= 0) {
-      alert("Please enter a valid number of hours.");
-      return;
-    }
-
-    navigate("/BookTeach", {
-      state: {
-        teacher: {
-          name: teacher.name,
-          email: teacher.email,
-          subject: teacher.subject,
-          phoneNumber: teacher.phoneNumber,
-          imageUrl: teacher.imageUrl,
-          pricePerHour: teacher.coursePrice,
-        },
-        hours: data.hours,
-        totalPrice: data.totalPrice,
-      },
-    });
-  };
-
   const handleLike = (email) => {
-    setEvaluations((prev) => {
-      const current = prev[email] || { like: false, dislike: false };
-      return {
-        ...prev,
-        [email]: {
-          like: !current.like,
-          dislike: current.like ? current.dislike : false,
-        },
-      };
-    });
+    dispatch(liketeachers({ email, useremail }));
   };
 
-  const handleDislike = (email) => {
-    setEvaluations((prev) => {
-      const current = prev[email] || { like: false, dislike: false };
-      return {
-        ...prev,
-        [email]: {
-          like: current.dislike ? current.like : false,
-          dislike: !current.dislike,
-        },
-      };
-    });
+  const handleBook = (teacherEmail) => {
+    navigate(`/BookTeach/${teacherEmail}`); // Adjust route to match your app routing
   };
 
   return (
-    <div className="user-teachers">
-      {teachers.map((teacher) => (
-        <div className="teacher-card" key={teacher.email}>
-          <img src={teacher.imageUrl} alt={teacher.name} />
-          <h3>{teacher.name}</h3>
-          <p>Subject: {teacher.subject}</p>
-          <p>phoneNumber: {teacher.phoneNumber}</p>
-          <p>Price per hour: {teacher.coursePrice} OMR</p>
+    <div className="catalog-container">
+      {teachers.map((teacher, index) => {
+        if (!teacher) return null;
 
-          <input
-            type="number"
-            min="1"
-            placeholder="Hours"
-            value={bookingData[teacher.email]?.hours || ""}
-            onChange={(e) =>
-              handleHourChange(teacher.email, Number(e.target.value))
-            }
-          />
+        const likedByUser = teacher.likes?.users?.includes(useremail);
 
-          <p>
-            Total:&nbsp;
-            {bookingData[teacher.email]?.totalPrice
-              ? `${bookingData[teacher.email].totalPrice} OMR`
-              : "0 OMR"}
-          </p>
+        return (
+          <div className="card" key={`${teacher.email}-${index}`}>
+            <div className="image-container">
+              <img src={teacher.imageUrl || "/default-teacher.png"} alt={teacher.name || "Teacher"} />
+            </div>
 
-          <div className="evaluation-buttons">
-            <FaThumbsUp
-              className={`like-icon ${evaluations[teacher.email]?.like ? "active" : ""}`}
+            <h2 className="product-name">{teacher.name || "No Name"}</h2>
+            <p className="description">Email: {teacher.email || "N/A"}</p>
+            <p className="description">Subject: {teacher.subject || "N/A"}</p>
+            <p className="description">Phone: {teacher.phoneNumber || "N/A"}</p>
+            <p className="price">{teacher.coursePrice ?? "N/A"} OMR</p>
+            <p className="date">{teacher.createdAt ? moment(teacher.createdAt).fromNow() : "Unknown date"}</p>
+
+            {/* Book Teacher button */}
+            <button
+              className="book-button"
+              onClick={() => handleBook(teacher.email)}
+              style={{
+                marginTop: "10px",
+                padding: "8px 16px",
+                backgroundColor: "#007bff",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Book Teacher
+            </button>
+
+            {/* Like button */}
+            <button
+              className="like-button"
               onClick={() => handleLike(teacher.email)}
-              title="Like"
-            />
-            <FaThumbsDown
-              className={`dislike-icon ${evaluations[teacher.email]?.dislike ? "active" : ""}`}
-              onClick={() => handleDislike(teacher.email)}
-              title="Dislike"
-            />
+              style={{
+                color: likedByUser ? "green" : "gray",
+                border: "none",
+                background: "transparent",
+                fontSize: "18px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+                marginTop: "10px",
+              }}
+            >
+              <FaThumbsUp />
+              <span>{teacher.likes?.count || 0}</span>
+            </button>
           </div>
-
-          <button className="book-button" onClick={() => handleBooking(teacher)}>
-            Book Now
-          </button>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
 
-export default BookTeachers;
+export default UserTeachers;
